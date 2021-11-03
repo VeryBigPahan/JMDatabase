@@ -3,10 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,10 +36,12 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try (Connection connection = Util.DbConnect(); Statement statement = connection.createStatement()) {
-            String sql = new StringBuilder().append("INSERT INTO USER (name, lastname, age) VALUES('").append(name)
-                    .append("', '").append(lastName).append("', ").append(age).append(");").toString();
-            statement.execute(sql);
+        try (Connection connection = Util.DbConnect()) {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO USER (name, lastname, age) VALUES(?, ?, ?)");
+            statement.setString(1, name);
+            statement.setString(2, lastName);
+            statement.setByte(3, age);
+            statement.execute();
             System.out.printf("User с именем – %s %s добавлен в базу данных \n", name, lastName);
             Util.DbCloseConnect(connection);
         } catch (SQLException e) {
@@ -51,9 +50,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        try (Connection connection = Util.DbConnect(); Statement statement = connection.createStatement()) {
-            String sql = "DELETE FROM user WHERE ID = " + id + ";";
-            statement.execute(sql);
+        try (Connection connection = Util.DbConnect()) {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM user WHERE ID = ?");
+            statement.setLong(1, id);
+            statement.execute();
             Util.DbCloseConnect(connection);
         } catch (SQLException e) {
             e.printStackTrace();
