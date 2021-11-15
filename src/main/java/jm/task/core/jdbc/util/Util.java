@@ -59,6 +59,7 @@ public class Util {
             StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(prop).build();
 
             sessionFactory = cfg.buildSessionFactory(serviceRegistry);
+            return sessionFactory;
         }
         return sessionFactory;
     }
